@@ -1,10 +1,17 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, Navigate, useParams } from 'react-router-dom'
 import { Dashboard } from './pages/Dashboard'
 import { Holders } from './pages/Holders'
 import { HolderDetail } from './pages/HolderDetail'
 import { Releases } from './pages/Releases'
 import { ReleaseDetail } from './pages/ReleaseDetail'
+import { Settings } from './pages/Settings'
 import { Navigation } from './components/Navigation'
+
+// Legacy redirect component for old holder detail URLs
+function HolderDetailRedirect() {
+  const { id } = useParams<{ id: string }>()
+  return <Navigate to={`/royalty-holders/${id}`} replace />
+}
 
 /**
  * ROOT APPLICATION COMPONENT
@@ -28,18 +35,23 @@ function App() {
         <Navigation />
         
         {/* Main content area with responsive layout */}
-        <div className="lg:pl-64 pt-16 lg:pt-0">  {/* Padding for sidebar (desktop) and mobile header */}
+        <div className="lg:pl-80 pt-16 lg:pt-0">  {/* Padding for sidebar (desktop) and mobile header */}
           <main className="container mx-auto px-4 lg:px-6 py-6 max-w-none">
             <Routes>
               {/* Redirect root to dashboard */}
               <Route path="/" element={<Navigate to="/dashboard" replace />} />
               
               {/* Main application routes */}
-              <Route path="/dashboard" element={<Dashboard />} />                    {/* Release performance analytics */}
-              <Route path="/holders" element={<Holders />} />                       {/* List all royalty holders */}
-              <Route path="/holders/:id" element={<HolderDetail />} />              {/* Individual holder details and payouts */}
-              <Route path="/releases" element={<Releases />} />                     {/* List all music releases */}
-              <Route path="/releases/:id" element={<ReleaseDetail />} />            {/* Individual release details and splits */}
+              <Route path="/dashboard" element={<Dashboard />} />                           {/* Release performance analytics */}
+              <Route path="/royalty-holders" element={<Holders />} />                      {/* List all royalty holders */}
+              <Route path="/royalty-holders/:id" element={<HolderDetail />} />             {/* Individual holder details and payouts */}
+              <Route path="/releases" element={<Releases />} />                            {/* List all music releases */}
+              <Route path="/releases/:id" element={<ReleaseDetail />} />                   {/* Individual release details and splits */}
+              <Route path="/settings" element={<Settings />} />                           {/* Application settings and configuration */}
+              
+              {/* Legacy redirects for old URLs */}
+              <Route path="/holders" element={<Navigate to="/royalty-holders" replace />} />
+              <Route path="/holders/:id" element={<HolderDetailRedirect />} />
             </Routes>
           </main>
         </div>

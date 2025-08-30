@@ -11,7 +11,9 @@ export interface Holder {
   name: string                    // Full name or company name
   email?: string                  // Contact email (optional)
   address?: string                // Physical address for payments (optional)
-  payment_details?: string        // Bank details, PayPal, etc. (optional)
+  sort_code?: string              // UK bank sort code in format xx-xx-xx (optional)
+  account_number?: string         // UK bank account number (optional)
+  vat_registered?: boolean        // Whether the holder is VAT registered (optional)
   min_payout_override?: number    // Custom minimum payout in minor units, overrides workspace default (optional)
   created_at: string             // ISO timestamp when record was created
   updated_at: string             // ISO timestamp when record was last modified

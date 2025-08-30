@@ -11,7 +11,7 @@ import {
   Statement,
   StatementEarning,
 } from '@/types'
-import { DEFAULT_MIN_PAYOUT_MINOR } from './constants'
+// import { DEFAULT_MIN_PAYOUT_MINOR } from './constants'  // Commented out as it's not currently used
 import { allocateRevenue, calculateBalances } from './allocation'
 
 import holdersData from '@/data/holders.json'
@@ -29,7 +29,14 @@ class MockAdapter implements DataAdapter {
     tracks: [...tracksData] as Track[],
     releaseSplits: [...releaseSplitsData] as ReleaseSplit[],
     trackSplits: [...trackSplitsData] as TrackSplit[],
-    transactions: [...transactionsData] as Transaction[],
+    transactions: [...transactionsData.map(t => ({
+      ...t,
+      release_id: t.release_id || undefined,
+      track_id: t.track_id || undefined,
+      holder_id: t.holder_id || undefined,
+      reference: t.reference || undefined,
+      created_by: t.created_by || undefined,
+    }))] as Transaction[],
     workspaceSettings: { ...workspaceSettingsData } as WorkspaceSettings,
   }
 

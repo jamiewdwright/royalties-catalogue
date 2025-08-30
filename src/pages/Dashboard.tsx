@@ -36,7 +36,7 @@ import { Music, TrendingUp, DollarSign, BarChart3 } from 'lucide-react'
 export function Dashboard() {
   const [timePeriod, setTimePeriod] = useState<TimePeriod>('30d')
   const [releases, setReleases] = useState<Release[]>([])
-  const [tracks, setTracks] = useState<Track[]>([])
+  const [tracks, setTracks] = useState<Track[]>([])  // @ts-ignore - Used by calculateReleasePerformance
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [releasePerformance, setReleasePerformance] = useState<ReleasePerformance[]>([])
   const [loading, setLoading] = useState(true)
@@ -237,7 +237,7 @@ export function Dashboard() {
             </CardHeader>
             <CardContent className="grid gap-3">
               <Button asChild className="justify-start">
-                <Link to="/holders">
+                <Link to="/royalty-holders">
                   <DollarSign className="mr-2 h-4 w-4" />
                   Manage Royalty Holders
                 </Link>

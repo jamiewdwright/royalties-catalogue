@@ -53,7 +53,7 @@ export function HolderDetail() {
     if (isNaN(amount) || amount <= 0) return
 
     const amountInMinor = Math.round(amount * 100)
-    const canPayoutBelowThreshold = balance.status === 'below_threshold' && amountInMinor <= balance.owed
+    // const canPayoutBelowThreshold = balance.status === 'below_threshold' && amountInMinor <= balance.owed  // Future use
 
     setSubmittingPayout(true)
 
@@ -96,7 +96,7 @@ export function HolderDetail() {
       <div className="text-center py-12">
         <h2 className="text-xl font-semibold">Holder not found</h2>
         <Button className="mt-4" asChild>
-          <Link to="/holders">Back to Holders</Link>
+          <Link to="/royalty-holders">Back to Royalty Holders</Link>
         </Button>
       </div>
     )
@@ -111,7 +111,7 @@ export function HolderDetail() {
     <div className="space-y-6">
       <div className="flex items-center gap-4">
         <Button variant="outline" size="sm" asChild>
-          <Link to="/holders">
+          <Link to="/royalty-holders">
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back
           </Link>
@@ -145,10 +145,31 @@ export function HolderDetail() {
                   <p className="mt-1 whitespace-pre-line">{holder.address}</p>
                 </div>
               )}
-              {holder.payment_details && (
+              {(holder.sort_code || holder.account_number) && (
                 <div>
-                  <label className="text-sm font-medium text-muted-foreground">Payment Details</label>
-                  <p className="mt-1">{holder.payment_details}</p>
+                  <label className="text-sm font-medium text-muted-foreground">Banking Details</label>
+                  <div className="mt-1 space-y-1">
+                    {holder.sort_code && (
+                      <p className="font-mono text-sm">
+                        <span className="text-muted-foreground">Sort Code:</span> {holder.sort_code}
+                      </p>
+                    )}
+                    {holder.account_number && (
+                      <p className="font-mono text-sm">
+                        <span className="text-muted-foreground">Account:</span> {holder.account_number}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              )}
+              {holder.vat_registered && (
+                <div>
+                  <label className="text-sm font-medium text-muted-foreground">VAT Status</label>
+                  <p className="mt-1">
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                      VAT Registered
+                    </span>
+                  </p>
                 </div>
               )}
             </CardContent>

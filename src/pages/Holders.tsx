@@ -4,6 +4,7 @@ import { Plus } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
+import { AddHolderDialog } from '@/components/AddHolderDialog'
 import { dataService } from '@/lib/data-service'
 import { formatCurrency } from '@/lib/constants'
 import { Holder, HolderBalance } from '@/types'
@@ -12,25 +13,30 @@ export function Holders() {
   const [holders, setHolders] = useState<Holder[]>([])
   const [balances, setBalances] = useState<HolderBalance[]>([])
   const [loading, setLoading] = useState(true)
+  const [showAddDialog, setShowAddDialog] = useState(false)
 
   useEffect(() => {
-    async function loadData() {
-      try {
-        const [holdersData, balancesData] = await Promise.all([
-          dataService.holders.getAll(),
-          dataService.holders.getBalances(),
-        ])
-        setHolders(holdersData)
-        setBalances(balancesData)
-      } catch (error) {
-        console.error('Error loading holders:', error)
-      } finally {
-        setLoading(false)
-      }
-    }
-
     loadData()
   }, [])
+
+  const loadData = async () => {
+    try {
+      const [holdersData, balancesData] = await Promise.all([
+        dataService.holders.getAll(),
+        dataService.holders.getBalances(),
+      ])
+      setHolders(holdersData)
+      setBalances(balancesData)
+    } catch (error) {
+      console.error('Error loading holders:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleHolderAdded = () => {
+    loadData()
+  }
 
   const holdersWithBalances = holders.map(holder => {
     const balance = balances.find(b => b.holder_id === holder.id)
@@ -50,9 +56,9 @@ export function Holders() {
             Manage royalty recipients and their payment details
           </p>
         </div>
-        <Button>
+        <Button onClick={() => setShowAddDialog(true)}>
           <Plus className="mr-2 h-4 w-4" />
-          Add Holder
+          Add Royalty Holder
         </Button>
       </div>
 
@@ -76,7 +82,7 @@ export function Holders() {
                 Get started by adding your first royalty holder.
               </p>
               <div className="mt-6">
-                <Button>
+                <Button onClick={() => setShowAddDialog(true)}>
                   <Plus className="mr-2 h-4 w-4" />
                   Add First Holder
                 </Button>
@@ -88,7 +94,8 @@ export function Holders() {
                 <TableRow>
                   <TableHead>Name</TableHead>
                   <TableHead>Email</TableHead>
-                  <TableHead>Payment Details</TableHead>
+                  <TableHead>Banking Details</TableHead>
+                  <TableHead>VAT</TableHead>
                   <TableHead className="text-right">Balance</TableHead>
                   <TableHead className="text-center">Status</TableHead>
                   <TableHead className="text-right">Threshold</TableHead>
@@ -107,8 +114,24 @@ export function Holders() {
                     <TableCell className="text-muted-foreground">
                       {holder.email || '—'}
                     </TableCell>
-                    <TableCell className="text-muted-foreground max-w-48 truncate">
-                      {holder.payment_details || '—'}
+                    <TableCell className="text-muted-foreground">
+                      {holder.sort_code && holder.account_number ? (
+                        <div className="font-mono text-sm">
+                          <div>{holder.sort_code}</div>
+                          <div>{holder.account_number}</div>
+                        </div>
+                      ) : (
+                        '—'
+                      )}
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {holder.vat_registered ? (
+                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                          VAT Reg
+                        </span>
+                      ) : (
+                        '—'
+                      )}
                     </TableCell>
                     <TableCell className="text-right font-mono">
                       {holder.balance ? (
@@ -138,7 +161,7 @@ export function Holders() {
                     <TableCell>
                       <div className="flex gap-2">
                         <Button variant="outline" size="sm" asChild>
-                          <Link to={`/holders/${holder.id}`}>Details</Link>
+                          <Link to={`/royalty-holders/${holder.id}`}>Details</Link>
                         </Button>
                       </div>
                     </TableCell>
@@ -149,6 +172,12 @@ export function Holders() {
           )}
         </CardContent>
       </Card>
+
+      <AddHolderDialog
+        open={showAddDialog}
+        onOpenChange={setShowAddDialog}
+        onHolderAdded={handleHolderAdded}
+      />
     </div>
   )
 }
