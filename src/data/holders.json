@@ -1,0 +1,22 @@
+[
+  {
+    "id": "holder-1",
+    "name": "Jamie Wright",
+    "email": "jamie@example.com",
+    "address": "123 Music Street, London, UK",
+    "payment_details": "Sort: 12-34-56, Account: 12345678",
+    "min_payout_override": null,
+    "created_at": "2024-01-01T10:00:00Z",
+    "updated_at": "2024-01-01T10:00:00Z"
+  },
+  {
+    "id": "holder-2",
+    "name": "Sam Producer",
+    "email": "sam@example.com",
+    "address": "456 Beat Avenue, Manchester, UK",
+    "payment_details": "Sort: 98-76-54, Account: 87654321",
+    "min_payout_override": 5000,
+    "created_at": "2024-01-01T10:00:00Z",
+    "updated_at": "2024-01-01T10:00:00Z"
+  }
+]

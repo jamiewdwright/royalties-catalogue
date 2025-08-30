@@ -1,0 +1,16 @@
+[
+  {
+    "id": "ts-1",
+    "track_id": "track-3",
+    "holder_id": "holder-1",
+    "percentage": 50,
+    "created_at": "2024-02-01T10:30:00Z"
+  },
+  {
+    "id": "ts-2",
+    "track_id": "track-3",
+    "holder_id": "holder-2",
+    "percentage": 50,
+    "created_at": "2024-02-01T10:30:00Z"
+  }
+]
