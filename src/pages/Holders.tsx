@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Plus } from 'lucide-react'
+import { Plus, Edit, Trash2 } from 'lucide-react'
+import { toast } from 'sonner'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
 import { AddHolderDialog } from '@/components/AddHolderDialog'
+import { EditHolderDialog } from '@/components/EditHolderDialog'
 import { dataService } from '@/lib/data-service'
 import { formatCurrency } from '@/lib/constants'
 import { Holder, HolderBalance } from '@/types'
@@ -14,6 +16,7 @@ export function Holders() {
   const [balances, setBalances] = useState<HolderBalance[]>([])
   const [loading, setLoading] = useState(true)
   const [showAddDialog, setShowAddDialog] = useState(false)
+  const [editingHolder, setEditingHolder] = useState<Holder | null>(null)
 
   useEffect(() => {
     loadData()
@@ -25,6 +28,7 @@ export function Holders() {
         dataService.holders.getAll(),
         dataService.holders.getBalances(),
       ])
+      
       setHolders(holdersData)
       setBalances(balancesData)
     } catch (error) {
@@ -36,6 +40,27 @@ export function Holders() {
 
   const handleHolderAdded = () => {
     loadData()
+  }
+
+  const handleHolderUpdated = () => {
+    loadData()
+    setEditingHolder(null)
+  }
+
+  const handleDeleteHolder = async (holder: Holder) => {
+    if (!confirm(`Are you sure you want to delete ${holder.name}? This action cannot be undone.`)) {
+      return
+    }
+
+    try {
+      await dataService.holders.delete(holder.id)
+      toast.success(`${holder.name} has been deleted successfully`)
+      loadData() // Refresh the list
+    } catch (error) {
+      console.error('Error deleting holder:', error)
+      const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred'
+      toast.error(`Failed to delete holder: ${errorMessage}`)
+    }
   }
 
   const holdersWithBalances = holders.map(holder => {
@@ -108,7 +133,7 @@ export function Holders() {
                     <TableCell>
                       <div>
                         <div className="font-medium">{holder.name}</div>
-                        <div className="text-sm text-muted-foreground">ID: {holder.id}</div>
+                        <div className="text-sm text-muted-foreground">{holder.r_number}</div>
                       </div>
                     </TableCell>
                     <TableCell className="text-muted-foreground">
@@ -163,6 +188,21 @@ export function Holders() {
                         <Button variant="outline" size="sm" asChild>
                           <Link to={`/royalty-holders/${holder.id}`}>Details</Link>
                         </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => setEditingHolder(holder)}
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => handleDeleteHolder(holder)}
+                          className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
                       </div>
                     </TableCell>
                   </TableRow>
@@ -177,6 +217,13 @@ export function Holders() {
         open={showAddDialog}
         onOpenChange={setShowAddDialog}
         onHolderAdded={handleHolderAdded}
+      />
+      
+      <EditHolderDialog
+        holder={editingHolder}
+        open={!!editingHolder}
+        onOpenChange={(open) => !open && setEditingHolder(null)}
+        onHolderUpdated={handleHolderUpdated}
       />
     </div>
   )

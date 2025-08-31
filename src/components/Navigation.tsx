@@ -1,7 +1,7 @@
 import { Link, useLocation } from 'react-router-dom'
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
-import { BarChart3, Users, Music, Home, Menu, X, Settings } from 'lucide-react'
+import { BarChart3, Users, Music, Home, Menu, X, Settings, Disc3, CreditCard, Upload } from 'lucide-react'
 
 /**
  * Main navigation component that provides left sidebar navigation for the app
@@ -20,9 +20,12 @@ export function Navigation() {
 
   // Navigation items configuration - easily extendable for new pages
   const navigation = [
-    { name: 'Dashboard', href: '/dashboard', icon: Home },
-    { name: 'Royalty Holders', href: '/royalty-holders', icon: Users },
-    { name: 'Releases', href: '/releases', icon: Music },
+    { name: 'Dashboard', href: '/dashboard', icon: Home, isSubItem: false },
+    { name: 'Royalty Holders', href: '/royalty-holders', icon: Users, isSubItem: false },
+    { name: 'Releases', href: '/releases', icon: Music, isSubItem: false },
+    { name: 'Tracks', href: '/tracks', icon: Disc3, isSubItem: true },
+    { name: 'Payouts', href: '/payouts', icon: CreditCard, isSubItem: false },
+    { name: 'Import Payments', href: '/import-payments', icon: Upload, isSubItem: false },
   ]
 
   /**
@@ -56,7 +59,11 @@ export function Navigation() {
                 onClick={() => setSidebarOpen(false)}
                 className={cn(
                   // Base styles for all navigation links
-                  'group flex items-center px-4 py-3 text-base font-medium rounded-md transition-colors',
+                  'group flex items-center py-3 text-base font-medium rounded-md transition-colors',
+                  // Conditional padding and indentation based on sub-item status
+                  item.isSubItem
+                    ? 'px-4 ml-8' // Sub-items: indented with margin-left
+                    : 'px-4', // Main items: normal padding
                   // Conditional styles based on active state
                   isActive
                     ? 'bg-primary text-primary-foreground' // Active: blue background
@@ -65,14 +72,25 @@ export function Navigation() {
               >
                 <Icon
                   className={cn(
-                    'mr-4 h-6 w-6 flex-shrink-0',
+                    'mr-4 flex-shrink-0',
+                    // Icon size based on sub-item status
+                    item.isSubItem
+                      ? 'h-5 w-5' // Sub-items: smaller icons
+                      : 'h-6 w-6', // Main items: regular size icons
                     // Icon color changes based on active state
                     isActive
                       ? 'text-primary-foreground' // Active: white icon
                       : 'text-muted-foreground group-hover:text-foreground' // Inactive: muted with hover
                   )}
                 />
-                {item.name}
+                <span className={cn(
+                  // Text size based on sub-item status
+                  item.isSubItem
+                    ? 'text-sm' // Sub-items: smaller text
+                    : 'text-base' // Main items: regular text
+                )}>
+                  {item.name}
+                </span>
               </Link>
             )
           })}

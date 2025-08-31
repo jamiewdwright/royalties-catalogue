@@ -46,7 +46,7 @@ export interface Allocation {
  */
 export function allocateRevenue(
   transaction: Transaction,
-  releases: Release[],  // @ts-ignore - Used in future implementation 
+  _releases: Release[],  // Used in future implementation 
   tracks: Track[],
   releaseSplits: ReleaseSplit[],
   trackSplits: TrackSplit[]

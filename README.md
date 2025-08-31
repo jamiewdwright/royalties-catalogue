@@ -20,14 +20,15 @@ A web application for single artists to manage music royalties, built with React
 - 🔄 Track-level management with split overrides
 - 🔄 Basic reporting and analytics
 - 🔄 CSV statement exports  
-- 🔄 Supabase integration with authentication
+- ✅ Supabase integration with R number and catalog number auto-generation
 - 🔄 Comprehensive testing suite
 
 ## Architecture
 
 ### Data Layer
-- **Adapter Pattern** - Pluggable data sources (Mock/Supabase)
-- **Mock Mode** - Default operation using JSON seed data
+- **Adapter Pattern** - Pluggable data sources (Supabase/Mock)
+- **Supabase Mode** - Default operation with PostgreSQL database
+- **Mock Mode** - Fallback using local JSON files
 - **Type Safety** - Full TypeScript coverage for entities and operations
 
 ### Business Logic
@@ -66,7 +67,7 @@ A web application for single artists to manage music royalties, built with React
    ```bash
    cp .env.example .env
    ```
-   The default configuration uses mock data (`VITE_DATA_SOURCE=mock`).
+   The application defaults to Supabase database. Set up your database following `supabase-setup-instructions.md`.
 
 4. **Start development server:**
    ```bash
@@ -137,18 +138,19 @@ The application will load with demo data including:
 
 ## Environment Configuration
 
-### Mock Mode (Default)
+### Supabase Mode (Default)
+```env
+# Required - get from your Supabase project dashboard
+VITE_SUPABASE_URL=https://your-project-id.supabase.co
+VITE_SUPABASE_ANON_KEY=your-anon-key-here
+```
+Data stored in PostgreSQL database with auto-generated R numbers and catalog numbers.
+
+### Mock Mode (Fallback)
 ```env
 VITE_DATA_SOURCE=mock
 ```
 Data stored in JSON files under `src/data/`, optionally persisted to localStorage.
-
-### Supabase Mode (Future)
-```env
-VITE_DATA_SOURCE=supabase
-VITE_SUPABASE_URL=your_supabase_project_url
-VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
-```
 
 ## File Structure
 
@@ -206,7 +208,7 @@ All monetary amounts are stored as **integers in minor units** (pence):
 - Comprehensive test coverage
 
 **MVP3 - Security & Auth**
-- Supabase authentication integration
+- Supabase authentication and user management
 - Row Level Security implementation  
 - Audit trail enhancements
 - Production deployment guides

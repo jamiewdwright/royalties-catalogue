@@ -4,6 +4,9 @@ import { Holders } from './pages/Holders'
 import { HolderDetail } from './pages/HolderDetail'
 import { Releases } from './pages/Releases'
 import { ReleaseDetail } from './pages/ReleaseDetail'
+import { Tracks } from './pages/Tracks'
+import { Payouts } from './pages/Payouts'
+import { ImportPayments } from './pages/ImportPayments'
 import { Settings } from './pages/Settings'
 import { Navigation } from './components/Navigation'
 
@@ -47,6 +50,9 @@ function App() {
               <Route path="/royalty-holders/:id" element={<HolderDetail />} />             {/* Individual holder details and payouts */}
               <Route path="/releases" element={<Releases />} />                            {/* List all music releases */}
               <Route path="/releases/:id" element={<ReleaseDetail />} />                   {/* Individual release details and splits */}
+              <Route path="/tracks" element={<Tracks />} />                                {/* All tracks across releases */}
+              <Route path="/payouts" element={<Payouts />} />                              {/* Payout batch management */}
+              <Route path="/import-payments" element={<ImportPayments />} />               {/* Revenue import system */}
               <Route path="/settings" element={<Settings />} />                           {/* Application settings and configuration */}
               
               {/* Legacy redirects for old URLs */}

@@ -44,6 +44,18 @@ class MockAdapter implements DataAdapter {
     return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
   }
 
+  private generateRNumber(): string {
+    // Get the highest existing R number and increment
+    const existingRNumbers = this.data.holders
+      .map(h => h.r_number)
+      .filter(r => r && r.match(/^R\d{3}$/))
+      .map(r => parseInt(r.substring(1)))
+    
+    const maxNumber = existingRNumbers.length > 0 ? Math.max(...existingRNumbers) : 0
+    const nextNumber = maxNumber + 1
+    return `R${nextNumber.toString().padStart(3, '0')}`
+  }
+
   holders = {
     getAll: async (): Promise<Holder[]> => {
       return [...this.data.holders]
@@ -58,6 +70,7 @@ class MockAdapter implements DataAdapter {
       const holder: Holder = {
         ...data,
         id: this.generateId(),
+        r_number: data.r_number || this.generateRNumber(), // Auto-generate R number if not provided
         created_at: now,
         updated_at: now,
       }
@@ -265,16 +278,25 @@ class MockAdapter implements DataAdapter {
 
     upsertSplits: async (
       releaseId: string,
-      splits: Array<{ holder_id: string; percentage: number }>
+      splits: Array<{ 
+        holder_id: string; 
+        percentage: number;
+        tier?: 'primary' | 'secondary';
+        split_order?: number;
+        description?: string;
+      }>
     ): Promise<ReleaseSplit[]> => {
       this.data.releaseSplits = this.data.releaseSplits.filter(s => s.release_id !== releaseId)
       
       const now = new Date().toISOString()
-      const newSplits = splits.map(split => ({
+      const newSplits = splits.map((split, index) => ({
         id: this.generateId(),
         release_id: releaseId,
         holder_id: split.holder_id,
         percentage: split.percentage,
+        tier: split.tier || 'secondary',
+        split_order: split.split_order || (index + 1),
+        description: split.description || null,
         created_at: now,
       }))
       
@@ -294,18 +316,27 @@ class MockAdapter implements DataAdapter {
 
     upsertSplits: async (
       trackId: string,
-      splits: Array<{ holder_id: string; percentage: number }>
+      splits: Array<{ 
+        holder_id: string; 
+        percentage: number;
+        tier?: 'primary' | 'secondary';
+        split_order?: number;
+        description?: string;
+      }>
     ): Promise<TrackSplit[]> => {
       this.data.trackSplits = this.data.trackSplits.filter(s => s.track_id !== trackId)
       
       const now = new Date().toISOString()
-      const newSplits = splits.map(split => ({
+      const newSplits = splits.map((split, index) => ({
         id: this.generateId(),
         track_id: trackId,
         holder_id: split.holder_id,
         percentage: split.percentage,
+        tier: split.tier || 'secondary',
+        split_order: split.split_order || (index + 1),
+        description: split.description || null,
         created_at: now,
-      }))
+      })) as TrackSplit[]
       
       this.data.trackSplits.push(...newSplits)
       return newSplits

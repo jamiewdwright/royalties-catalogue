@@ -1,21 +1,33 @@
 [
   {
     "id": "holder-1",
+    "r_number": "R001",
     "name": "Jamie Wright",
+    "type": "performer",
+    "status": "active",
     "email": "jamie@example.com",
     "address": "123 Music Street, London, UK",
-    "payment_details": "Sort: 12-34-56, Account: 12345678",
+    "sort_code": "12-34-56",
+    "account_number": "12345678",
+    "vat_registered": false,
     "min_payout_override": null,
+    "notes": null,
     "created_at": "2024-01-01T10:00:00Z",
     "updated_at": "2024-01-01T10:00:00Z"
   },
   {
     "id": "holder-2",
+    "r_number": "R002",
     "name": "Sam Producer",
+    "type": "composer",
+    "status": "active",
     "email": "sam@example.com",
     "address": "456 Beat Avenue, Manchester, UK",
-    "payment_details": "Sort: 98-76-54, Account: 87654321",
+    "sort_code": "98-76-54",
+    "account_number": "87654321",
+    "vat_registered": true,
     "min_payout_override": 5000,
+    "notes": "Prefers electronic transfer",
     "created_at": "2024-01-01T10:00:00Z",
     "updated_at": "2024-01-01T10:00:00Z"
   }

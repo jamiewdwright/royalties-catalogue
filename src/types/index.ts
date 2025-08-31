@@ -7,68 +7,85 @@
  * Represents a royalty recipient (person or entity that receives payments)
  */
 export interface Holder {
-  id: string                      // Unique identifier
-  name: string                    // Full name or company name
-  email?: string                  // Contact email (optional)
-  address?: string                // Physical address for payments (optional)
-  sort_code?: string              // UK bank sort code in format xx-xx-xx (optional)
-  account_number?: string         // UK bank account number (optional)
-  vat_registered?: boolean        // Whether the holder is VAT registered (optional)
-  min_payout_override?: number    // Custom minimum payout in minor units, overrides workspace default (optional)
-  created_at: string             // ISO timestamp when record was created
-  updated_at: string             // ISO timestamp when record was last modified
+  id: string                                                  // Unique identifier
+  r_number: string                                           // Human-readable ID (R001, R002, etc.)
+  name: string                                               // Full name or company name
+  type: 'performer' | 'composer' | 'arranger' | 'partner' | 'guest' | 'other'  // Type of holder
+  status: 'active' | 'inactive'                              // Current status of the holder
+  email?: string                                             // Contact email (optional)
+  address?: string                                           // Physical address for payments (optional)
+  sort_code?: string                                         // UK bank sort code in format xx-xx-xx (optional)
+  account_number?: string                                    // UK bank account number (optional)
+  vat_registered?: boolean                                   // Whether the holder is VAT registered (optional)
+  min_payout_override?: number                               // Custom minimum payout in minor units, overrides workspace default (optional)
+  notes?: string                                             // Additional notes about the holder (optional)
+  created_at: string                                         // ISO timestamp when record was created
+  updated_at: string                                         // ISO timestamp when record was last modified
 }
 
 /**
  * Represents a music release (album, EP, or single)
  */
 export interface Release {
-  id: string                                    // Unique identifier
-  title: string                                 // Release title
-  artist: string                                // Main artist name
-  release_type: 'single' | 'ep' | 'album'     // Type of release
-  upc?: string                                  // Universal Product Code for physical/digital distribution (optional)
-  release_date?: string                         // ISO date string (optional)
-  created_at: string                           // ISO timestamp when record was created
-  updated_at: string                           // ISO timestamp when record was last modified
+  id: string                                                 // Unique identifier
+  catalog_number: string                                     // Human-readable catalog number (SWG001, SWG002, etc.)
+  title: string                                              // Release title
+  artist: string                                             // Main artist name
+  release_type: 'single' | 'ep' | 'album'                  // Type of release
+  split_method: 'standard' | 'primary_first'               // Split calculation method
+  primary_splits_total?: number                            // Cached total percentage of primary splits
+  upc?: string                                              // Universal Product Code for physical/digital distribution (optional)
+  release_date?: string                                     // ISO date string (optional)
+  created_at: string                                        // ISO timestamp when record was created
+  updated_at: string                                        // ISO timestamp when record was last modified
 }
 
 /**
  * Represents an individual track within a release
  */
 export interface Track {
-  id: string              // Unique identifier
-  release_id: string      // Foreign key linking to parent release
-  title: string           // Track title
-  track_number: number    // Position on the release (1, 2, 3, etc.)
-  isrc?: string           // International Standard Recording Code (optional)
-  use_release_splits: boolean  // If true: inherit splits from release; if false: use custom track splits
-  created_at: string      // ISO timestamp when record was created
-  updated_at: string      // ISO timestamp when record was last modified
+  id: string                                    // Unique identifier
+  release_id?: string                           // Foreign key linking to parent release (optional for standalone tracks)
+  title: string                                 // Track title
+  track_number: number                          // Position on the release (1, 2, 3, etc.)
+  isrc?: string                                // International Standard Recording Code (optional)
+  use_release_splits: boolean                   // If true: inherit splits from release; if false: use custom track splits
+  split_method: 'standard' | 'primary_first'  // Split calculation method (when using custom splits)
+  created_at: string                           // ISO timestamp when record was created
+  updated_at: string                           // ISO timestamp when record was last modified
 }
 
 /**
  * Defines how royalties are split at the release level
- * All percentages for a release must sum to exactly 100%
+ * For standard method: all splits must sum to 100%
+ * For primary_first method: primary splits taken from gross, secondary splits must sum to 100% of remainder
  */
 export interface ReleaseSplit {
-  id: string          // Unique identifier
-  release_id: string  // Foreign key linking to release
-  holder_id: string   // Foreign key linking to royalty holder
-  percentage: number  // Percentage of revenue (0-100, can have decimals)
-  created_at: string  // ISO timestamp when split was created
+  id: string                                    // Unique identifier
+  release_id: string                            // Foreign key linking to release
+  holder_id: string                             // Foreign key linking to royalty holder
+  percentage: number                            // Percentage of revenue (0-100, can have decimals)
+  tier: 'primary' | 'secondary'                // Split tier for calculation order
+  split_order: number                           // Order within tier (1, 2, 3...)
+  description?: string                          // Human-readable description (e.g., "Management Commission")
+  created_at: string                           // ISO timestamp when split was created
 }
 
 /**
  * Defines custom royalty splits for individual tracks
  * Only used when track.use_release_splits = false
+ * For standard method: all splits must sum to 100%
+ * For primary_first method: primary splits taken from gross, secondary splits must sum to 100% of remainder
  */
 export interface TrackSplit {
-  id: string          // Unique identifier
-  track_id: string    // Foreign key linking to track
-  holder_id: string   // Foreign key linking to royalty holder
-  percentage: number  // Percentage of revenue (0-100, can have decimals)
-  created_at: string  // ISO timestamp when split was created
+  id: string                                    // Unique identifier
+  track_id: string                              // Foreign key linking to track
+  holder_id: string                             // Foreign key linking to royalty holder
+  percentage: number                            // Percentage of revenue (0-100, can have decimals)
+  tier: 'primary' | 'secondary'                // Split tier for calculation order
+  split_order: number                           // Order within tier (1, 2, 3...)
+  description?: string                          // Human-readable description (e.g., "Management Commission")
+  created_at: string                           // ISO timestamp when split was created
 }
 
 /**
@@ -145,3 +162,47 @@ export interface StatementEarning {
  * 'supabase' = use Supabase database
  */
 export type DataSource = 'mock' | 'supabase'
+
+/**
+ * Split calculation result showing how revenue is allocated
+ */
+export interface SplitAllocation {
+  split: ReleaseSplit | TrackSplit              // The split configuration
+  amount: number                                // Calculated amount in minor units
+  base_amount: number                           // The amount this percentage was calculated from
+  calculation_order: number                     // Order in which this split was calculated
+}
+
+/**
+ * Complete split calculation result
+ */
+export interface SplitCalculationResult {
+  allocations: SplitAllocation[]                // Individual allocations
+  total_revenue: number                         // Original revenue amount
+  primary_deductions: number                    // Total amount taken by primary splits
+  secondary_pool: number                        // Amount available for secondary splits
+  method: 'standard' | 'primary_first'        // Calculation method used
+}
+
+/**
+ * Split template for common split configurations
+ */
+export interface SplitTemplate {
+  id: string                                    // Unique identifier
+  name: string                                  // Template name (e.g., "Standard Management Deal")
+  description: string                           // Description of when to use this template
+  split_method: 'standard' | 'primary_first'  // Calculation method
+  template_splits: TemplateSplit[]             // Template split definitions
+  created_at: string                           // ISO timestamp when created
+}
+
+/**
+ * Template split definition
+ */
+export interface TemplateSplit {
+  tier: 'primary' | 'secondary'                // Split tier
+  split_order: number                           // Order within tier
+  percentage: number                            // Percentage allocation
+  description: string                           // Description (e.g., "Management Commission")
+  holder_type?: string                         // Optional holder type hint
+}

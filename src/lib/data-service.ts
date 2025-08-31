@@ -1,5 +1,6 @@
 import { DataAdapter } from './data-adapter'
 import { mockAdapter } from './mock-adapter'
+import { supabaseAdapter } from './supabase-adapter'
 
 /**
  * DATA SERVICE FACTORY
@@ -23,7 +24,7 @@ import { mockAdapter } from './mock-adapter'
  */
 function getDataSource(): 'mock' | 'supabase' {
   const source = import.meta.env.VITE_DATA_SOURCE
-  return source === 'supabase' ? 'supabase' : 'mock'
+  return source === 'mock' ? 'mock' : 'supabase' // Default to Supabase now
 }
 
 /**
@@ -34,12 +35,11 @@ export function createDataAdapter(): DataAdapter {
   const source = getDataSource()
   
   switch (source) {
-    case 'supabase':
-      // Future: import and return Supabase adapter
-      throw new Error('Supabase adapter not yet implemented')
     case 'mock':
-    default:
       return mockAdapter
+    case 'supabase':
+    default:
+      return supabaseAdapter // Default to Supabase now
   }
 }
 

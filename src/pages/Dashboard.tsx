@@ -36,7 +36,7 @@ import { Music, TrendingUp, DollarSign, BarChart3 } from 'lucide-react'
 export function Dashboard() {
   const [timePeriod, setTimePeriod] = useState<TimePeriod>('30d')
   const [releases, setReleases] = useState<Release[]>([])
-  const [tracks, setTracks] = useState<Track[]>([])  // @ts-ignore - Used by calculateReleasePerformance
+  const [_tracks, setTracks] = useState<Track[]>([])  // Used by calculateReleasePerformance in future
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [releasePerformance, setReleasePerformance] = useState<ReleasePerformance[]>([])
   const [loading, setLoading] = useState(true)

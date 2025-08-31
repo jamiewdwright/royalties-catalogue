@@ -66,7 +66,13 @@ export interface DataAdapter {
    */
   releaseSplits: {
     getByReleaseId(releaseId: string): Promise<ReleaseSplit[]>                                                                          // Get splits for a release
-    upsertSplits(releaseId: string, splits: Array<{ holder_id: string; percentage: number }>): Promise<ReleaseSplit[]>               // Replace all splits for a release
+    upsertSplits(releaseId: string, splits: Array<{ 
+      holder_id: string; 
+      percentage: number;
+      tier?: 'primary' | 'secondary';
+      split_order?: number;
+      description?: string;
+    }>): Promise<ReleaseSplit[]>               // Replace all splits for a release
     deleteByReleaseId(releaseId: string): Promise<void>                                                                              // Delete all splits for a release
   }
   
@@ -75,7 +81,13 @@ export interface DataAdapter {
    */
   trackSplits: {
     getByTrackId(trackId: string): Promise<TrackSplit[]>                                                                            // Get splits for a track
-    upsertSplits(trackId: string, splits: Array<{ holder_id: string; percentage: number }>): Promise<TrackSplit[]>                // Replace all splits for a track
+    upsertSplits(trackId: string, splits: Array<{ 
+      holder_id: string; 
+      percentage: number;
+      tier?: 'primary' | 'secondary';
+      split_order?: number;
+      description?: string;
+    }>): Promise<TrackSplit[]>                // Replace all splits for a track
     deleteByTrackId(trackId: string): Promise<void>                                                                                // Delete all splits for a track
   }
   
